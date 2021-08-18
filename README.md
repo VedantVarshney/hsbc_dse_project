@@ -10,16 +10,11 @@ The goal of this project is to run classification algorithms to identify whether
 
 # The Deliverables of one team
 
-- A jupyter notebook
-- A non-technical business presentation
+* A jupyter notebook
+* A non-technical business presentation
 
 # Key Points
 
-- Feel free to try a bunch of different models: logistic regression, decision trees, or anything else you think would be appropriate.
+* Feel free to try a bunch of different models: logistic regression, decision trees, or anything else you think would be appropriate.
 
-- You must choose appropriate classification metrics and use them to evaluate your models. Choosing the right classification metrics is a key data science skill, and should be informed by data exploration and the business problem itself. You must then use this metric to evaluate your model performance using both training and testing data.
-
-
-```python
-
-```
+* You must choose appropriate classification metrics and use them to evaluate your models. Choosing the right classification metrics is a key data science skill, and should be informed by data exploration and the business problem itself. You must then use this metric to evaluate your model performance using both training and testing data.

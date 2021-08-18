@@ -1,4 +1,4 @@
-# Project Overview
+## Project Overview
 
 For this project, you will engage in the full data science process from start to finish, solving a classification problem using the provided bank marketing dataset. You will be working in teams of 2 to finish this project. Your goal should be to explore the data, implement a classification algorithm and interpret the results. The interpretation will ideally be non-technical and should be delivered as a presentation on Friday, 20th Aug at 11:00 am ET.
 

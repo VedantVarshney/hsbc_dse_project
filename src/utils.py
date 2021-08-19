@@ -3,9 +3,12 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split, cross_val_score
 from imblearn.over_sampling import SMOTE
-from sklearn.metrics import plot_roc_curve as plot_roc_curve_sk
+from sklearn.metrics import plot_roc_curve as plot_roc_curve_sk, classification_report
 
 from matplotlib import pyplot as plt
+
+# Misc variables (useful for formatting print reports)
+sep = "\n_________________________________________\n"
 
 def preprocess(df,
               cont_cols = ["age", "balance", "duration"],
@@ -13,6 +16,7 @@ def preprocess(df,
               copy=True,
               test_size=0.25,
               target="y",
+              drop_cols=None,
               random_state=None):
     """
     Preprocesses the dataset by applying transforms and adding dummy
@@ -34,6 +38,9 @@ def preprocess(df,
 
     if copy:
         df = df.copy()
+
+    if drop_cols is not None:
+        df.drop(drop_cols, inplace=True)
 
     y = df[target].apply(lambda x: x=="yes").astype(int)
     X = df.drop(target, axis=1)
@@ -117,3 +124,8 @@ def plot_roc_curve(clfs, X, y):
 
     plt.legend()
     plt.show()
+
+def print_classification_reports(clfs, Xs, ys, names):
+    for clf, X, y, name in zip(clfs, Xs, ys, names):
+        print(f"{name}: {sep}")
+        print(classification_report(y, clf.predict(X)))

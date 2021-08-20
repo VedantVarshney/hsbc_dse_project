@@ -187,7 +187,7 @@ def compare_classification_reports(clfs, Xs, ys, names, clean=True,
     - plot - plot report comparison
     - save_fpath - file path to save plot
     - suptite - super title of figure
-    - subplot_kwargs - kwards for plt.suplots()
+    - subplot_kwargs - kwargs for plt.suplots()
     - cbar_orient - orientation of cbar (either 'horizontal' or 'vertical')
 
     Returns:
@@ -205,7 +205,7 @@ def compare_classification_reports(clfs, Xs, ys, names, clean=True,
     cmap = red_greens_cmap()
 
     if plot:
-        for df, ax, name, cbar in zip(dfs, axs, names, [False, True]):
+        for df, ax, name in zip(dfs, axs, names):
             im = sns.heatmap(df.drop("support", axis=1),
                 cmap=cmap, annot=True, vmin=vmin, vmax=vmax, cbar=False, ax=ax)
             ax.set_title(name)

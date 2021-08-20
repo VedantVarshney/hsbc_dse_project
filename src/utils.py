@@ -130,8 +130,9 @@ def plot_roc_curve(clfs, X, y, labels=None, shade=True,
 
     xfit = np.linspace(0, 1, 1000)
     ax.plot(xfit, xfit, "--", label="Skill-Less Classifier (AUC=0.50)", alpha=0.8)
-    plt.legend(fontsize="large", loc=4)
-
+    plt.legend(fontsize="x-large", loc='lower right')
+    plt.xlabel('False Positive Rate (Positive label: 1)')
+    plt.ylabel('True Positive Rate (Positive label: 1)')
     if save_fpath is not None:
         plt.savefig(save_fpath, bbox_inches="tight")
 
@@ -219,7 +220,7 @@ def compare_classification_reports(clfs, Xs, ys, names, clean=True,
         # fig.tight_layout()
 
         if save_fpath is not None:
-            plt.savefig(save_fpath, bbox_inches="tight")
+            plt.savefig(save_fpath, bbox_inches="tight", edgecolor='white')
 
         plt.show()
 

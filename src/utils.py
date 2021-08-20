@@ -130,7 +130,7 @@ def plot_roc_curve(clfs, X, y, labels=None, shade=True,
 
     xfit = np.linspace(0, 1, 1000)
     ax.plot(xfit, xfit, "--", label="Skill-Less Classifier (AUC=0.50)", alpha=0.8)
-    plt.legend(fontsize="x-large")
+    plt.legend(fontsize="large", loc=4)
 
     if save_fpath is not None:
         plt.savefig(save_fpath, bbox_inches="tight")
@@ -209,6 +209,7 @@ def compare_classification_reports(clfs, Xs, ys, names, clean=True,
             im = sns.heatmap(df.drop("support", axis=1),
                 cmap=cmap, annot=True, vmin=vmin, vmax=vmax, cbar=False, ax=ax)
             ax.set_title(name)
+            ax.tick_params(axis='y', rotation=0)
 
         mappable = im.get_children()[0]
         plt.colorbar(mappable, ax=axs, orientation = cbar_orient)

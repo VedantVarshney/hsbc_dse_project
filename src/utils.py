@@ -112,8 +112,9 @@ def plot_feature_importances(feature_importances, feature_names,
         return feature_importances[feature_importances < thresh]
 
 
-def plot_roc_curve(clfs, X, y, labels=None, shade=True):
-    fig, ax = plt.subplots()
+def plot_roc_curve(clfs, X, y, labels=None, shade=True,
+    subplots_kwargs={}, save_fpath=None):
+    fig, ax = plt.subplots(**subplots_kwargs)
 
     if isinstance(clfs, list):
         if labels is not None:
@@ -128,7 +129,12 @@ def plot_roc_curve(clfs, X, y, labels=None, shade=True):
         plot_roc_curve_sk(clfs, X, y, ax=ax)
 
     xfit = np.linspace(0, 1, 1000)
-    ax.plot(xfit, xfit, "--", label="Skill-Less Classifier", alpha=0.8)
+    ax.plot(xfit, xfit, "--", label="Skill-Less Classifier (AUC=0.50)", alpha=0.8)
+    plt.legend(fontsize="x-large")
+
+    if save_fpath is not None:
+        plt.savefig(save_fpath, bbox_inches="tight")
+
     plt.show()
 
 def print_classification_reports(clfs, Xs, ys, names):
@@ -149,7 +155,8 @@ def red_greens_cmap():
     return LinearSegmentedColormap.from_list('rg',l, N=256)
 
 
-def classification_report_df(clf, X, y, clean=True, plot=True):
+def classification_report_df(clf, X, y, clean=True,
+    plot=True, save_fpath=None):
     df = pd.DataFrame(classification_report(y,clf.predict(X),
             output_dict=True))
 
@@ -161,5 +168,58 @@ def classification_report_df(clf, X, y, clean=True, plot=True):
 
     if plot:
         sns.heatmap(df.drop("support", axis=1), cmap=red_greens_cmap(), annot=True)
+        if save_fpath is not None:
+            plt.savefig(save_fpath, bbox_inches="tight")
         plt.show()
     return df
+
+def compare_classification_reports(clfs, Xs, ys, names, clean=True,
+    plot=True, save_fpath=None, suptitle=None, subplot_kwargs={},
+    cbar_orient="horizontal"):
+    """
+    Compare classification reports for classifiers
+    Arguments:
+    - clfs - list of classifiers
+    - Xs - list of X dataframes (for each classifier)
+    - ys - list of known classifications (for each classifier)
+    - names - list of classifier names (for labelling)
+    - clean - round all floats to 2.d.p.
+    - plot - plot report comparison
+    - save_fpath - file path to save plot
+    - suptite - super title of figure
+    - subplot_kwargs - kwards for plt.suplots()
+    - cbar_orient - orientation of cbar (either 'horizontal' or 'vertical')
+
+    Returns:
+    - dfs - list of classification report dataframes
+    - plot - if plot==True, displays comparison plot
+    """
+    dfs = []
+    for clf, X, y in zip(clfs, Xs, ys):
+        dfs.append(classification_report_df(clf, X, y, clean=clean, plot=False))
+
+    vmin = min([df.drop("support", axis=1).min().min() for df in dfs])
+    vmax = max([df.drop("support", axis=1).max().max() for df in dfs])
+
+    fig, axs = plt.subplots(**subplot_kwargs, sharex=True, sharey=True)
+    cmap = red_greens_cmap()
+
+    if plot:
+        for df, ax, name, cbar in zip(dfs, axs, names, [False, True]):
+            im = sns.heatmap(df.drop("support", axis=1),
+                cmap=cmap, annot=True, vmin=vmin, vmax=vmax, cbar=False, ax=ax)
+            ax.set_title(name)
+
+        mappable = im.get_children()[0]
+        plt.colorbar(mappable, ax=axs, orientation = cbar_orient)
+
+        if suptitle is not None:
+            plt.suptitle(suptitle, fontsize="x-large")
+        # fig.tight_layout()
+
+        if save_fpath is not None:
+            plt.savefig(save_fpath, bbox_inches="tight")
+
+        plt.show()
+
+    return dfs

@@ -6,6 +6,8 @@ from imblearn.over_sampling import SMOTE
 from sklearn.metrics import plot_roc_curve as plot_roc_curve_sk, classification_report
 
 from matplotlib import pyplot as plt
+from  matplotlib.colors import LinearSegmentedColormap
+import seaborn as sns
 
 # Misc variables (useful for formatting print reports)
 sep = "\n_________________________________________\n"
@@ -110,22 +112,54 @@ def plot_feature_importances(feature_importances, feature_names,
         return feature_importances[feature_importances < thresh]
 
 
-def plot_roc_curve(clfs, X, y):
+def plot_roc_curve(clfs, X, y, labels=None, shade=True):
     fig, ax = plt.subplots()
 
     if isinstance(clfs, list):
-        for clf in clfs:
-            plot_roc_curve_sk(clf, X, y, ax=ax)
+        if labels is not None:
+            assert isinstance(labels, list)
+        for clf, label in zip(clfs, labels):
+            displ = plot_roc_curve_sk(clf, X, y, ax=ax, name=label,
+                ls="--", alpha=0.8)
+            if shade:
+                ax.fill_between(x=displ.fpr, y1=displ.tpr,
+                    color=displ.line_.get_color(), alpha=0.1)
     else:
         plot_roc_curve_sk(clfs, X, y, ax=ax)
 
     xfit = np.linspace(0, 1, 1000)
-    ax.plot(xfit, xfit, "--", label="Skill-Less Classifier")
-
-    plt.legend()
+    ax.plot(xfit, xfit, "--", label="Skill-Less Classifier", alpha=0.8)
     plt.show()
 
 def print_classification_reports(clfs, Xs, ys, names):
     for clf, X, y, name in zip(clfs, Xs, ys, names):
         print(f"{name}: {sep}")
         print(classification_report(y, clf.predict(X)))
+
+
+def red_greens_cmap():
+    """
+    Red-to-green seaborn cmap
+    Ref:
+    https://stackoverflow.com/questions/38246559/how-to-create-a-heat-map-in-python-that-ranges-from-green-to-red
+    """
+    c = ["darkred", "red", "lightcoral", "white", "palegreen", "green", "darkgreen"]
+    v = [0,.15,.4,.5,0.6,.9,1.]
+    l = list(zip(v,c))
+    return LinearSegmentedColormap.from_list('rg',l, N=256)
+
+
+def classification_report_df(clf, X, y, clean=True, plot=True):
+    df = pd.DataFrame(classification_report(y,clf.predict(X),
+            output_dict=True))
+
+    df.loc[:, "accuracy"] = [np.nan, np.nan, df.accuracy[0], df["macro avg"][-1]]
+    df = df.T
+    if clean:
+        df = df.round(2)
+        df.loc[:, "support"] = df.support.astype(int)
+
+    if plot:
+        sns.heatmap(df.drop("support", axis=1), cmap=red_greens_cmap(), annot=True)
+        plt.show()
+    return df
